@@ -30,10 +30,11 @@ const providerDetails = {
     name: 'OpenAI',
     url: 'https://platform.openai.com/api-keys',
     prefix: 'sk-',
-    description: 'GPT-4, GPT-4o, and other OpenAI models',
+    description: 'GPT-5, GPT-4, GPT-4o, and other OpenAI models',
     models: {
       'gpt-4o': 'GPT-4o (Best quality, vision) ⭐',
       'gpt-4o-mini': 'GPT-4o Mini (Fast & cheap)',
+      'gpt-5-mini': 'GPT-5 Mini (Faster & cheaper) ⭐⭐',
       'gpt-4-turbo': 'GPT-4 Turbo (Powerful, vision)',
       'gpt-4': 'GPT-4 (Powerful)',
       'gpt-4-32k': 'GPT-4 32K (Extended context)',
