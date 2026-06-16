@@ -39,8 +39,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 async function generateCommentWithClaude(post, platform, mode = 'normal', length = 'medium', emoji = true, cockyBoost = false, techBoost = false, recipientName = '', thinking = false, customCTA = '', temperature = 0.5) {
-  const storage = await chrome.storage.local.get(['apiKey', 'provider', 'model', 'pronoun']);
-  const { apiKey, provider = 'openrouter', model, pronoun = 'I' } = storage;
+  const local = await chrome.storage.local.get(['apiKey']);
+  const sync = await chrome.storage.sync.get(['provider', 'model', 'pronoun']);
+  const apiKey = local.apiKey;
+  const provider = sync.provider || 'openrouter';
+  const model = sync.model;
+  const pronoun = sync.pronoun || 'I';
 
   console.log('Generate config:', { provider, model, hasApiKey: !!apiKey, pronoun });
 
@@ -195,7 +199,11 @@ async function callOpenAI(apiKey, prompt, systemPrompt, model, thinking = false,
 }
 
 async function analyzePost(post) {
-  const { apiKey, provider = 'openrouter', model } = await chrome.storage.local.get(['apiKey', 'provider', 'model']);
+  const local = await chrome.storage.local.get(['apiKey']);
+  const sync = await chrome.storage.sync.get(['provider', 'model']);
+  const apiKey = local.apiKey;
+  const provider = sync.provider || 'openrouter';
+  const model = sync.model;
 
   if (!apiKey) {
     throw new Error('API key not configured. Please go to settings and add your API key.');
