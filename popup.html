@@ -373,6 +373,14 @@
       color: #3b82f6;
     }
 
+    body.dark-mode .close-btn {
+      color: #cbd5e1;
+    }
+
+    body.dark-mode .close-btn:hover {
+      color: #60a5fa;
+    }
+
     .history-item {
       padding: 10px 12px;
       border-bottom: 1px solid #e5e7eb;
@@ -720,7 +728,7 @@
       <div style="background: white; margin: 20px; border-radius: 8px; padding: 20px; max-width: 600px; max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <h2 style="margin: 0; font-size: 20px;">📊 Your Stats</h2>
-          <button id="closeStatsBtn" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+          <button id="closeStatsBtn" class="close-btn" style="font-size: 24px;">✕</button>
         </div>
 
         <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
