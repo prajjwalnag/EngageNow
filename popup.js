@@ -48,6 +48,10 @@ let lastPost = '';
 let lastPlatform = '';
 let lastMode = '';
 let lastLength = '';
+let currentStatsFilter = 'today';
+let platformChart = null;
+let trendChart = null;
+let distributionChart = null;
 
 // Load preferences - use sync for UI prefs, local for sensitive data
 document.addEventListener('DOMContentLoaded', () => {
@@ -263,6 +267,7 @@ regenerateBtn.addEventListener('click', generateComment);
 copyBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(generatedComment);
   addToHistory(generatedComment);
+  trackCommentStat(selectedPlatform);
   const originalText = copyBtn.textContent;
   copyBtn.textContent = '✅ Copied!';
   setTimeout(() => {
@@ -420,4 +425,230 @@ async function analyzePost() {
     analyzeBtn.disabled = false;
     analyzeBtn.textContent = '🔍';
   }
+}
+
+// Stats tracking
+function trackCommentStat(platform) {
+  const today = new Date().toISOString().split('T')[0];
+  chrome.storage.local.get(['commentStats'], (data) => {
+    let stats = data.commentStats || [];
+    const existingIndex = stats.findIndex(s => s.date === today && s.platform === platform);
+
+    if (existingIndex >= 0) {
+      stats[existingIndex].count += 1;
+    } else {
+      stats.push({
+        date: today,
+        platform: platform,
+        count: 1
+      });
+    }
+
+    chrome.storage.local.set({ commentStats: stats });
+  });
+}
+
+// Load and filter stats
+function getFilteredStats(filter) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['commentStats'], (data) => {
+      let stats = data.commentStats || [];
+      const today = new Date();
+      let filtered = [];
+
+      stats.forEach(stat => {
+        const statDate = new Date(stat.date);
+        const daysAgo = Math.floor((today - statDate) / (1000 * 60 * 60 * 24));
+
+        if (filter === 'today' && daysAgo === 0) {
+          filtered.push(stat);
+        } else if (filter === 'week' && daysAgo < 7) {
+          filtered.push(stat);
+        } else if (filter === 'month' && daysAgo < 30) {
+          filtered.push(stat);
+        } else if (filter === 'all') {
+          filtered.push(stat);
+        }
+      });
+
+      resolve(filtered);
+    });
+  });
+}
+
+const statsLink = document.getElementById('statsLink');
+const statsContainer = document.getElementById('statsContainer');
+const closeStatsBtn = document.getElementById('closeStatsBtn');
+const clearStatsBtn = document.getElementById('clearStatsBtn');
+const statsBtns = document.querySelectorAll('.stats-filter-btn');
+
+statsLink.addEventListener('click', () => {
+  statsContainer.style.display = 'block';
+  renderStats('today');
+});
+
+closeStatsBtn.addEventListener('click', () => {
+  statsContainer.style.display = 'none';
+  destroyCharts();
+});
+
+statsContainer.addEventListener('click', (e) => {
+  if (e.target === statsContainer) {
+    statsContainer.style.display = 'none';
+    destroyCharts();
+  }
+});
+
+statsBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const filter = btn.dataset.filter;
+    if (filter) {
+      statsBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderStats(filter);
+    }
+  });
+});
+
+clearStatsBtn.addEventListener('click', () => {
+  if (confirm('Clear all statistics? This cannot be undone.')) {
+    chrome.storage.local.set({ commentStats: [] });
+    statsContainer.style.display = 'none';
+    destroyCharts();
+  }
+});
+
+function destroyCharts() {
+  if (platformChart) platformChart.destroy();
+  if (trendChart) trendChart.destroy();
+  if (distributionChart) distributionChart.destroy();
+}
+
+async function renderStats(filter) {
+  const stats = await getFilteredStats(filter);
+
+  if (!stats || stats.length === 0) {
+    document.getElementById('statsTotal').textContent = 'Total: 0 comments';
+    document.getElementById('statsBreakdown').textContent = 'No data yet. Start posting comments!';
+    destroyCharts();
+    return;
+  }
+
+  const platforms = ['facebook', 'linkedin', 'x', 'reddit'];
+  const platformCounts = {};
+  let total = 0;
+
+  platforms.forEach(p => { platformCounts[p] = 0; });
+  stats.forEach(s => {
+    platformCounts[s.platform] = (platformCounts[s.platform] || 0) + s.count;
+    total += s.count;
+  });
+
+  document.getElementById('statsTotal').textContent = `Total: ${total} comments`;
+
+  const breakdown = Object.entries(platformCounts)
+    .filter(([_, count]) => count > 0)
+    .map(([platform, count]) => `${platform}: ${count}`)
+    .join(' • ');
+  document.getElementById('statsBreakdown').textContent = breakdown || 'No data';
+
+  destroyCharts();
+  renderPlatformChart(platformCounts);
+  renderTrendChart(stats, filter);
+  renderDistributionChart(platformCounts);
+}
+
+function renderPlatformChart(platformCounts) {
+  const ctx = document.getElementById('platformChart').getContext('2d');
+  const colors = {
+    facebook: '#1877F2',
+    linkedin: '#0A66C2',
+    x: '#000000',
+    reddit: '#FF4500'
+  };
+
+  platformChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(platformCounts).map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+      datasets: [{
+        label: 'Comments Posted',
+        data: Object.values(platformCounts),
+        backgroundColor: Object.keys(platformCounts).map(p => colors[p]),
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+}
+
+function renderTrendChart(stats, filter) {
+  const dateMap = {};
+  stats.forEach(s => {
+    dateMap[s.date] = (dateMap[s.date] || 0) + s.count;
+  });
+
+  const sortedDates = Object.keys(dateMap).sort();
+  const ctx = document.getElementById('trendChart').getContext('2d');
+
+  trendChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sortedDates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+      datasets: [{
+        label: 'Daily Comments',
+        data: sortedDates.map(d => dateMap[d]),
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#3b82f6'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+}
+
+function renderDistributionChart(platformCounts) {
+  const ctx = document.getElementById('distributionChart').getContext('2d');
+  const colors = {
+    facebook: '#1877F2',
+    linkedin: '#0A66C2',
+    x: '#000000',
+    reddit: '#FF4500'
+  };
+
+  const labels = Object.keys(platformCounts).filter(p => platformCounts[p] > 0);
+  const data = labels.map(p => platformCounts[p]);
+  const bgColors = labels.map(p => colors[p]);
+
+  distributionChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+      datasets: [{
+        data: data,
+        backgroundColor: bgColors,
+        borderColor: '#fff',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
 }
