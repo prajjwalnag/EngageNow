@@ -142,7 +142,7 @@ async function callOpenAI(apiKey, prompt, systemPrompt, model, thinking = false,
 
     const body = {
       model: model || 'gpt-4o-mini',
-      max_tokens: 300,
+      max_completion_tokens: 300,
       temperature: temperature,
       messages: [
         {
@@ -198,21 +198,21 @@ async function analyzePost(post) {
     throw new Error('API key not configured. Please go to settings and add your API key.');
   }
 
-  const systemPrompt = `You are an expert content analyst. Analyze social media posts and provide concise, actionable insights. Return ONLY the formatted HTML analysis, nothing else.`;
+  const systemPrompt = `You are an expert content analyst. Analyze social media posts and provide concise, actionable insights. Return ONLY the formatted text analysis, nothing else.`;
 
-  const prompt = `Analyze this social media post and provide insights in this exact HTML format:
+  const prompt = `Analyze this social media post and provide insights:
 
-<strong>Topic:</strong> [main theme]<br>
-<strong>Sentiment:</strong> [positive/neutral/negative]<br>
-<strong>Content Type:</strong> [question/story/announcement/discussion/etc]<br>
-<strong>Best For:</strong> [Facebook/LinkedIn/Both]<br>
-<strong>Key Points:</strong> [1-2 main ideas]<br>
-<strong>Response Approach:</strong> [how to best respond]<br>
-<strong>Engagement Potential:</strong> [high/medium/low + reason]
+Topic: [main theme]
+Sentiment: [positive/neutral/negative]
+Content Type: [question/story/announcement/discussion/etc]
+Best For: [Facebook/LinkedIn/Both]
+Key Points: [1-2 main ideas]
+Response Approach: [how to best respond]
+Engagement Potential: [high/medium/low + reason]
 
 Post: "${post}"
 
-Return only the formatted analysis with no extra text.`;
+Provide the analysis in plain text format with each item on a new line.`;
 
   try {
     let analysis;
@@ -233,7 +233,7 @@ async function callOpenRouter(apiKey, prompt, systemPrompt, model, thinking = fa
 
     const body = {
       model: model || 'openai/gpt-4o-mini',
-      max_tokens: 300,
+      max_completion_tokens: 300,
       temperature: temperature,
       messages: [
         {
