@@ -5,6 +5,7 @@ const pronounSelect = document.getElementById('pronoun');
 const thinkingCheckbox = document.getElementById('thinking');
 const saveBtn = document.getElementById('saveBtn');
 const clearBtn = document.getElementById('clearBtn');
+const testBtn = document.getElementById('testBtn');
 const statusEl = document.getElementById('status');
 const providerInfo = document.getElementById('providerInfo');
 
@@ -166,3 +167,91 @@ function showStatus(message, type) {
     }, 3000);
   }
 }
+
+// Test API Key
+testBtn.addEventListener('click', async () => {
+  const apiKey = apiKeyInput.value.trim();
+  const provider = providerSelect.value;
+  const model = modelSelect.value;
+  const details = providerDetails[provider];
+
+  if (!apiKey) {
+    showStatus('Please enter an API key first', 'error');
+    return;
+  }
+
+  if (!apiKey.startsWith(details.prefix)) {
+    showStatus(`Invalid API key format. Should start with ${details.prefix}`, 'error');
+    return;
+  }
+
+  testBtn.disabled = true;
+  testBtn.textContent = '🔄 Testing...';
+
+  try {
+    const testPrompt = 'Say "API key is valid" in one sentence.';
+    const testSystemPrompt = 'You are a helpful assistant.';
+
+    let response;
+    if (provider === 'openai') {
+      response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: model || 'gpt-4o-mini',
+          max_tokens: 50,
+          messages: [
+            { role: 'system', content: testSystemPrompt },
+            { role: 'user', content: testPrompt }
+          ]
+        })
+      });
+    } else {
+      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://engagenow.app',
+          'X-Title': 'EngageNow'
+        },
+        body: JSON.stringify({
+          model: model || 'openai/gpt-4o-mini',
+          max_tokens: 50,
+          messages: [
+            { role: 'system', content: testSystemPrompt },
+            { role: 'user', content: testPrompt }
+          ]
+        })
+      });
+    }
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        showStatus('✅ API key is valid! Ready to use.', 'success');
+      } else {
+        showStatus('⚠️ API key works but got unexpected response. Try generating anyway.', 'success');
+      }
+    } else {
+      const errorData = await response.json();
+      const errorMsg = errorData.error?.message || errorData.error || 'Unknown error';
+
+      if (response.status === 401 || response.status === 403) {
+        showStatus('❌ Invalid API key or no access. Check your key and try again.', 'error');
+      } else if (response.status === 429) {
+        showStatus('❌ Rate limited. Wait a moment and try again.', 'error');
+      } else {
+        showStatus(`❌ API Error: ${errorMsg}`, 'error');
+      }
+    }
+  } catch (error) {
+    showStatus('❌ Network error. Check your connection and API key.', 'error');
+  } finally {
+    testBtn.disabled = false;
+    testBtn.textContent = '🧪 Test API Key';
+  }
+});
