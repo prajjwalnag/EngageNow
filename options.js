@@ -18,15 +18,12 @@ const providerDetails = {
     models: {
       'anthropic/claude-3.5-sonnet': 'Claude 3.5 Sonnet (Best quality) ⭐',
       'openai/gpt-4o': 'GPT-4o (Excellent quality)',
-      'openai/gpt-4-turbo': 'GPT-4 Turbo (Powerful)',
       'openai/gpt-4o-mini': 'GPT-4o Mini (Fast & cheap)',
-      'anthropic/claude-3.5-haiku': 'Claude 3.5 Haiku (Very fast mini)',
+      'anthropic/claude-3.5-haiku': 'Claude 3.5 Haiku (Very fast)',
       'anthropic/claude-3-opus': 'Claude 3 Opus (Powerful)',
-      'meta-llama/llama-3.1-70b': 'Llama 3.1 70b (Fast & smart)',
-      'meta-llama/llama-3.1-8b': 'Llama 3.1 8b (Ultra-fast mini)',
+      'meta-llama/llama-3.1-70b': 'Llama 3.1 70b (Smart & fast)',
       'mistralai/mistral-large': 'Mistral Large (Capable)',
-      'mistralai/mistral-7b-instruct': 'Mistral 7b (Fast mini)',
-      'meta-llama/llama-2-70b': 'Llama 2 70b (Good quality)'
+      'mistralai/mistral-small': 'Mistral Small (Fast)'
     }
   },
   openai: {
@@ -37,11 +34,9 @@ const providerDetails = {
     models: {
       'gpt-4o': 'GPT-4o (Best quality) ⭐',
       'gpt-4o-mini': 'GPT-4o Mini (Fast & cheap)',
-      'gpt-4-turbo': 'GPT-4 Turbo (Powerful & balanced)',
-      'gpt-4-turbo-preview': 'GPT-4 Turbo Preview (Older turbo)',
-      'gpt-4': 'GPT-4 (Previous gen)',
-      'gpt-3.5-turbo': 'GPT-3.5 Turbo (Ultra-fast)',
-      'gpt-4-32k': 'GPT-4 32K (Extended context)'
+      'gpt-4-turbo': 'GPT-4 Turbo (Powerful)',
+      'gpt-4': 'GPT-4 (Powerful)',
+      'gpt-3.5-turbo': 'GPT-3.5 Turbo (Fast)'
     }
   }
 };
