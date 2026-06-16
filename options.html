@@ -2,243 +2,475 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <title>EngageNow — Settings</title>
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --border: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-light: #eef2ff;
+      --accent-glow: rgba(99, 102, 241, 0.15);
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --success-text: #166534;
+      --error-bg: #fef2f2;
+      --error-border: #fecaca;
+      --error-text: #991b1b;
+      --radius: 10px;
+      --radius-sm: 7px;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 32px 20px;
+    }
+
+    .page {
       max-width: 520px;
-      margin: 0;
-      padding: 24px;
-      background: #f8f9fa;
+      margin: 0 auto;
     }
 
-    .container {
-      background: white;
-      padding: 28px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    /* ── Header ─────────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
     }
 
-    h1 {
-      margin: 0 0 16px 0;
-      color: #1a1a1a;
-      font-size: 26px;
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+      flex-shrink: 0;
+    }
+
+    .page-title {
+      font-size: 22px;
       font-weight: 700;
+      color: var(--text-primary);
       letter-spacing: -0.5px;
     }
 
-    .info {
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
-      padding: 14px;
-      margin-bottom: 24px;
-      border-radius: 6px;
+    .page-subtitle {
       font-size: 13px;
-      color: #1e293b;
-      line-height: 1.6;
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
-    .form-group {
-      margin-bottom: 24px;
+    /* ── Card ───────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      overflow: hidden;
     }
 
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #374151;
+    .card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-header-icon {
+      font-size: 15px;
+    }
+
+    .card-header-title {
       font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .card-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Form fields ────────────────────────── */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
     }
 
-    input[type="password"],
-    input[type="text"],
+    .field-input,
     select {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 13px;
-      background: #fafbfc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      transition: all 0.2s;
-    }
-
-    input[type="password"],
-    input[type="text"] {
-      font-family: monospace;
-    }
-
-    input:focus,
-    select:focus {
+      font-family: inherit;
+      background: var(--surface2);
+      color: var(--text-primary);
       outline: none;
-      border-color: #3b82f6;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      transition: all 0.18s;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
-    .button-group {
-      display: flex;
-      gap: 10px;
+    input[type="password"] {
+      font-family: monospace;
+      letter-spacing: 1px;
     }
 
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      transition: all 0.2s;
+    .field-input:focus,
+    select:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    .save-btn {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: white;
-      flex: 1;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    .select-wrapper {
+      position: relative;
     }
 
-    .save-btn:hover {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-      transform: translateY(-1px);
-    }
-
-    .save-btn:disabled {
-      background: #d1d5db;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .clear-btn {
-      background: white;
-      color: #374151;
-      border: 1px solid #e5e7eb;
-    }
-
-    .clear-btn:hover {
-      border-color: #3b82f6;
-      background: #eff6ff;
-      color: #3b82f6;
-    }
-
-    .status {
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .success {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #bbf7d0;
-    }
-
-    .error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
-    }
-
-    .help-text {
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
       font-size: 12px;
-      color: #6b7280;
-      margin-top: 8px;
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-muted);
       line-height: 1.5;
     }
 
-    a {
-      color: #3b82f6;
+    .field-hint a {
+      color: var(--accent);
       text-decoration: none;
-      transition: color 0.2s;
     }
 
-    a:hover {
-      color: #2563eb;
-      text-decoration: underline;
+    .field-hint a:hover { text-decoration: underline; }
+
+    /* ── Info banner ────────────────────────── */
+    .info-banner {
+      background: var(--accent-light);
+      border: 1px solid #c7d2fe;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #3730a3;
+      line-height: 1.6;
     }
+
+    .info-banner a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .info-banner a:hover { text-decoration: underline; }
+
+    /* ── Toggle ─────────────────────────────── */
+    .toggle-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(18px);
+    }
+
+    .toggle-info { flex: 1; }
+
+    .toggle-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 2px;
+      cursor: pointer;
+    }
+
+    .toggle-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Buttons ────────────────────────────── */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      justify-content: center;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn-primary:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text-secondary);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .btn-outline {
+      width: 100%;
+      justify-content: center;
+      background: var(--surface);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-outline:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-outline:disabled {
+      background: var(--surface2);
+      border-color: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    /* ── Status messages ────────────────────── */
+    .status {
+      display: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .status.success {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success-text);
+    }
+
+    .status.error {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: var(--error-text);
+    }
+
+    /* ── Footer ─────────────────────────────── */
+    .page-footer {
+      text-align: center;
+      padding: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .page-footer span { font-weight: 600; color: var(--accent); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔑 API Configuration</h1>
+  <div class="page">
 
-    <div class="form-group">
-      <label for="provider">API Provider</label>
-      <select id="provider" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-        <option value="openrouter">OpenRouter (Claude, GPT, etc.)</option>
-        <option value="openai">OpenAI (GPT-4, GPT-4o, etc.)</option>
-      </select>
-      <div class="help-text" style="margin-top: 8px;">
-        Choose your preferred API provider
+    <!-- Header -->
+    <div class="page-header">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="page-title">Settings</div>
+        <div class="page-subtitle">Configure your AI provider and preferences</div>
       </div>
     </div>
 
-    <div id="providerInfo" class="info"></div>
+    <!-- Provider Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">🔌</span>
+        <span class="card-header-title">API Provider</span>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label class="field-label" for="provider">Provider</label>
+          <div class="select-wrapper">
+            <select id="provider">
+              <option value="openrouter">OpenRouter — Claude, GPT & 100+ models</option>
+              <option value="openai">OpenAI — GPT-4, GPT-4o & more</option>
+            </select>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label for="apiKey">API Key</label>
-      <input
-        type="password"
-        id="apiKey"
-        placeholder="sk-..."
-        autocomplete="off"
-      >
-      <div class="help-text">
-        Your API key is stored locally on your device and never shared.
+        <div id="providerInfo" class="info-banner"></div>
+
+        <div class="field">
+          <label class="field-label" for="apiKey">API Key</label>
+          <input type="password" id="apiKey" class="field-input" placeholder="sk-..." autocomplete="off">
+          <div class="field-hint">Stored locally on your device — never sent to third parties.</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="model">Model</label>
+          <div class="select-wrapper">
+            <select id="model"></select>
+          </div>
+          <div class="field-hint">Cost and quality vary per model. Recommended options are marked ⭐</div>
+        </div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="model">Model</label>
-      <select id="model" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-        <!-- Models will be populated by JavaScript based on provider -->
-      </select>
-      <div class="help-text">
-        Choose your AI model. Performance and cost vary by model.
+    <!-- Preferences Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">🎛️</span>
+        <span class="card-header-title">Preferences</span>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label class="field-label" for="pronoun">Writing Voice</label>
+          <div class="select-wrapper">
+            <select id="pronoun">
+              <option value="I">I — Solo creator / freelancer</option>
+              <option value="we">We — Team / agency</option>
+            </select>
+          </div>
+          <div class="field-hint">Controls whether comments are written in first person singular or plural.</div>
+        </div>
+
+        <div class="toggle-row">
+          <label class="toggle">
+            <input type="checkbox" id="thinking">
+            <span class="toggle-slider"></span>
+          </label>
+          <div class="toggle-info">
+            <label class="toggle-label" for="thinking">Extended Thinking</label>
+            <span class="toggle-desc">AI reasons through the response before writing. Better quality, slightly slower.</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="pronoun">Pronoun Preference</label>
-      <select id="pronoun" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-        <option value="I">I (Solo creator/freelancer)</option>
-        <option value="we">We (Team/agency)</option>
-      </select>
-      <div class="help-text">
-        Choose your preferred pronoun. This affects how responses are written.
+    <!-- Actions Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-icon">💾</span>
+        <span class="card-header-title">Save & Test</span>
+      </div>
+      <div class="card-body">
+        <div class="btn-row">
+          <button class="btn btn-primary" id="saveBtn">💾 Save Settings</button>
+          <button class="btn btn-secondary" id="clearBtn">🗑️ Clear Key</button>
+        </div>
+        <button class="btn btn-outline" id="testBtn">🧪 Test API Key</button>
+        <div id="status" class="status"></div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="thinking">
-        <input type="checkbox" id="thinking" style="margin-right: 8px; cursor: pointer;">
-        <span style="cursor: pointer;">Enable Extended Thinking</span>
-      </label>
-      <div class="help-text">
-        AI will think through the response before generating. Produces better quality but takes slightly longer.
-      </div>
+    <div class="page-footer">
+      <span>EngageNow</span> v2.4.0 &nbsp;·&nbsp; All data stored locally
     </div>
 
-    <div class="button-group">
-      <button class="save-btn" id="saveBtn">Save API Key</button>
-      <button class="clear-btn" id="clearBtn">Clear</button>
-    </div>
-
-    <button id="testBtn" style="width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #3b82f6; background: white; color: #3b82f6; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">🧪 Test API Key</button>
-
-    <div id="status"></div>
   </div>
-
   <script src="options.js"></script>
 </body>
 </html>

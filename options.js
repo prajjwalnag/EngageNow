@@ -85,7 +85,7 @@ providerSelect.addEventListener('change', () => {
 function updateProviderInfo() {
   const provider = providerSelect.value;
   const details = providerDetails[provider];
-  providerInfo.innerHTML = `Get an API key at <a href="${details.url}" target="_blank">${details.name}</a>. ${details.description}`;
+  providerInfo.innerHTML = `Get your API key at <a href="${details.url}" target="_blank">${details.name}</a> — ${details.description}`;
 }
 
 function populateModels() {

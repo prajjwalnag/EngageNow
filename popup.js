@@ -109,8 +109,8 @@ toneBtns.forEach(btn => {
       btn.classList.add('active');
       selectedMode = btn.dataset.mode;
 
-      // Show name field only for inbox mode
       nameContainer.style.display = selectedMode === 'inbox' ? 'block' : 'none';
+      nameContainer.style.setProperty('display', selectedMode === 'inbox' ? 'block' : 'none', 'important');
     });
   }
 });
@@ -271,8 +271,9 @@ closeAnalysisBtn.addEventListener('click', () => {
   analysisContainer.style.display = 'none';
 });
 
-// Regenerate button
+// Regenerate buttons
 regenerateBtn.addEventListener('click', generateComment);
+document.getElementById('regenBtnAlt').addEventListener('click', generateComment);
 
 // Copy comment
 copyBtn.addEventListener('click', () => {
@@ -293,10 +294,10 @@ settingsLink.addEventListener('click', () => {
 
 // History toggle
 historyBtn.addEventListener('click', () => {
-  historyContainer.style.display = historyContainer.style.display === 'none' ? 'block' : 'none';
-  if (historyContainer.style.display === 'block') {
-    loadHistory();
-  }
+  const isVisible = historyContainer.style.display === 'block';
+  historyContainer.style.display = isVisible ? 'none' : 'block';
+  historyBtn.classList.toggle('active', !isVisible);
+  if (!isVisible) loadHistory();
 });
 
 // Clear history
