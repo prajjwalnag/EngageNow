@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 420px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f8f9fa;
+      transition: background 0.3s, color 0.3s;
+      color: #1a1a1a;
+    }
+
+    body.dark-mode {
+      background: #0f1419;
+      color: #e0e0e0;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    body.dark-mode .section {
+      background: #1a1f2e;
+      border-color: #404854;
+    }
+
+    .section:hover {
+      border-color: #d1d5db;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode .section:hover {
+      border-color: #505866;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    body.dark-mode label {
+      color: #cbd5e1;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      background: #fafbfc;
+      transition: all 0.2s;
+    }
+
+    body.dark-mode textarea,
+    body.dark-mode input[type="text"] {
+      background: #0f1419;
+      border-color: #404854;
+      color: #e0e0e0;
+    }
+
+    textarea {
+      height: 110px;
+      resize: vertical;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    body.dark-mode textarea:focus,
+    body.dark-mode input[type="text"]:focus {
+      background: #1a1f2e;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .tone-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tone-btn {
+      flex: 1;
+      min-width: 70px;
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    body.dark-mode .tone-btn {
+      background: #0f1419;
+      border-color: #404854;
+      color: #cbd5e1;
+    }
+
+    .tone-btn:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    body.dark-mode .tone-btn:hover {
+      background: #1e293b;
+      border-color: #3b82f6;
+    }
+
+    .tone-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      font-weight: 600;
+    }
+
+    body.dark-mode .tone-btn.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .boost-btn {
+      padding: 9px 12px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    body.dark-mode .boost-btn {
+      background: #0f1419;
+      border-color: #404854;
+      color: #cbd5e1;
+    }
+
+    .boost-btn:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    body.dark-mode .boost-btn:hover {
+      background: #1e293b;
+      border-color: #3b82f6;
+    }
+
+    .boost-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      font-weight: 600;
+    }
+
+    .help-text {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    body.dark-mode .help-text {
+      color: #9ca3af;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .generate-btn {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .generate-btn:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .icon-btn {
+      padding: 12px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.dark-mode .icon-btn {
+      background: #1a1f2e;
+      border-color: #404854;
+      color: #cbd5e1;
+    }
+
+    .icon-btn:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    body.dark-mode .icon-btn:hover {
+      background: #1e293b;
+      border-color: #3b82f6;
+    }
+
+    .icon-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .result {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 14px;
+      min-height: 60px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    body.dark-mode .result {
+      background: #1a1f2e;
+      border-color: #404854;
+      color: #cbd5e1;
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 11px;
+      margin-top: 10px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      transition: all 0.2s;
+    }
+
+    body.dark-mode .copy-btn {
+      background: #1a1f2e;
+      border-color: #404854;
+      color: #cbd5e1;
+    }
+
+    .copy-btn:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      color: #3b82f6;
+    }
+
+    body.dark-mode .copy-btn:hover {
+      background: #1e293b;
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+
+    .error {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    body.dark-mode .error {
+      background: #7f1d1d;
+      border-color: #991b1b;
+      color: #fca5a5;
+    }
+
+    .analysis-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    body.dark-mode .analysis-box {
+      background: #1e293b;
+      border-left-color: #3b82f6;
+    }
+
+    .analysis-content {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #1f2937;
+    }
+
+    body.dark-mode .analysis-content {
+      color: #cbd5e1;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: #3b82f6;
+    }
+
+    .history-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    body.dark-mode .history-item {
+      border-bottom-color: #404854;
+    }
+
+    .history-item:hover {
+      background: #f3f4f6;
+    }
+
+    body.dark-mode .history-item:hover {
+      background: #1e293b;
+    }
+
+    .history-item-text {
+      flex: 1;
+      color: #374151;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    body.dark-mode .history-item-text {
+      color: #cbd5e1;
+    }
+
+    .history-item-time {
+      color: #9ca3af;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .history-item-copy {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 5px 8px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      color: #374151;
+      transition: all 0.2s;
+    }
+
+    body.dark-mode .history-item-copy {
+      background: #1a1f2e;
+      border-color: #404854;
+      color: #cbd5e1;
+    }
+
+    .history-item-copy:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    #historyContainer {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: white;
+      display: none;
+      margin-top: 16px;
+    }
+
+    body.dark-mode #historyContainer {
+      background: #1a1f2e;
+      border-color: #404854;
+    }
+
+    #emptyHistory {
+      padding: 20px 12px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .settings-link {
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .settings-link a {
+      color: #3b82f6;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .settings-link a:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e5e7eb;
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    body.dark-mode input[type="range"] {
+      background: #404854;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #2563eb;
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+      transform: scale(1.15);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+
+    input[type="range"]::-moz-range-thumb:hover {
+      background: #2563eb;
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+      transform: scale(1.15);
+    }
+
+    body.dark-mode input[type="range"] {
+      accent-color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✨ Comment Generator</h1>
+
+    <div id="nameContainer" style="display: none;" class="section">
+      <label>Recipient Name</label>
+      <input type="text" id="recipientName" placeholder="e.g., John, Sarah...">
+    </div>
+
+    <div class="section">
+      <label>Your Post</label>
+      <textarea id="postText" placeholder="Paste the post or content here..."></textarea>
+    </div>
+
+    <div class="section">
+      <label>Platform</label>
+      <div class="tone-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button class="tone-btn active" data-platform="facebook">👍 Facebook</button>
+        <button class="tone-btn" data-platform="linkedin">💼 LinkedIn</button>
+        <button class="tone-btn" data-platform="x">𝕏 X</button>
+        <button class="tone-btn" data-platform="reddit">🤖 Reddit</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Base Mode</label>
+      <div class="tone-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button class="tone-btn active" data-mode="normal">ℹ️ Informative</button>
+        <button class="tone-btn" data-mode="sell">💰 Sell</button>
+        <button class="tone-btn" data-mode="inbox">📨 Inbox</button>
+        <button class="tone-btn" data-mode="engagement-agree">👍 Agree</button>
+        <button class="tone-btn" data-mode="engagement-ask" style="grid-column: 1 / -1;">❓ Engage</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <label for="customCTA">Custom CTA (Optional)</label>
+      <input type="text" id="customCTA" placeholder="e.g., DM for details, Reply with your thoughts...">
+      <div class="help-text">Add a custom call-to-action to include in your comment</div>
+    </div>
+
+    <div class="section">
+      <label>Add Boosts (Optional)</label>
+      <div class="tone-group">
+        <button id="cockyBoost" class="boost-btn" title="Add confidence & swagger">😎 Cocky</button>
+        <button id="techBoost" class="boost-btn" title="Add technical terminology">🤖 Tech</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Length</label>
+      <div class="tone-group">
+        <button class="tone-btn active" data-length="medium">📝 Medium</button>
+        <button class="tone-btn" data-length="short">⚡ Short</button>
+        <button class="tone-btn" data-length="long">📖 Long</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Creativity Level</label>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <input type="range" id="temperatureSlider" min="0" max="100" value="50" style="flex: 1; height: 6px; cursor: pointer; accent-color: #3b82f6;">
+        <span id="temperatureValue" style="min-width: 40px; text-align: right; font-weight: 600; font-size: 13px; color: #374151;">Balanced</span>
+      </div>
+      <div class="help-text">Low = consistent, High = creative & varied</div>
+    </div>
+
+    <div class="section">
+      <div class="action-row">
+        <button class="generate-btn" id="generateBtn">Generate Comment</button>
+        <button id="analyzeBtn" class="icon-btn" title="Analyze the post">🔍</button>
+        <button id="regenerateBtn" class="icon-btn" style="display: none;" title="Generate another version">🔄</button>
+      </div>
+      <div class="action-row" style="gap: 6px;">
+        <button id="historyBtn" class="icon-btn" style="flex: 1;" title="View history (24h)">📜 History</button>
+        <button id="emojiToggleBtn" class="icon-btn" title="Toggle emojis">😊</button>
+        <button id="darkModeBtn" class="icon-btn" title="Toggle dark mode">🌙</button>
+      </div>
+    </div>
+
+    <div id="analysisContainer" style="display: none;" class="section">
+      <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
+        <div id="analysisContent" class="analysis-content"></div>
+        <button id="closeAnalysisBtn" class="close-btn" title="Close">✕</button>
+      </div>
+    </div>
+
+    <div id="historyContainer">
+      <div style="padding: 12px; border-bottom: 1px solid #e5e7eb; background: white; border-radius: 6px 6px 0 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 13px;">History (24h)</strong>
+          <button id="clearHistoryBtn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 11px; font-weight: 500; text-decoration: underline; transition: color 0.2s;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#9ca3af'">Clear</button>
+        </div>
+      </div>
+      <div id="historyList" style="max-height: 200px; overflow-y: auto;"></div>
+      <div id="emptyHistory">No comments yet</div>
+    </div>
+
+    <div id="resultContainer" style="display: none;">
+      <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span id="charCount" style="font-size: 12px; color: #9ca3af;">0 characters</span>
+        </div>
+        <div class="result" id="result"></div>
+        <button class="copy-btn" id="copyBtn">📋 Copy Comment</button>
+      </div>
+    </div>
+
+    <div id="errorContainer" style="display: none;">
+      <div class="error" id="error"></div>
+    </div>
+
+    <div class="settings-link">
+      <a id="settingsLink">⚙️ Settings</a>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
