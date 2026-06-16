@@ -36,10 +36,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 async function generateCommentWithClaude(post, platform, mode = 'normal', length = 'medium', emoji = true, cockyBoost = false, techBoost = false, recipientName = '', thinking = false, customCTA = '', temperature = 0.5) {
-  const { apiKey, provider = 'openrouter', model, pronoun = 'I' } = await chrome.storage.local.get(['apiKey', 'provider', 'model', 'pronoun']);
+  const storage = await chrome.storage.local.get(['apiKey', 'provider', 'model', 'pronoun']);
+  const { apiKey, provider = 'openrouter', model, pronoun = 'I' } = storage;
+
+  console.log('Generate config:', { provider, model, hasApiKey: !!apiKey, pronoun });
 
   if (!apiKey) {
     throw new Error('API key not configured. Please go to settings and add your API key.');
+  }
+
+  if (!model) {
+    throw new Error('No model selected. Please go to settings and choose a model.');
   }
 
   let systemPrompt = '';
@@ -131,6 +138,8 @@ Write only the comment, nothing else.`;
 
 async function callOpenAI(apiKey, prompt, systemPrompt, model, thinking = false, temperature = 0.5) {
   try {
+    console.log('Calling OpenAI with model:', model);
+
     const body = {
       model: model || 'gpt-4o-mini',
       max_tokens: 300,
@@ -163,15 +172,22 @@ async function callOpenAI(apiKey, prompt, systemPrompt, model, thinking = false,
       body: JSON.stringify(body)
     });
 
+    console.log('OpenAI response status:', response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to generate comment');
+      console.error('OpenAI error response:', errorData);
+      throw new Error(errorData.error?.message || `API error ${response.status}`);
     }
 
     const data = await response.json();
+    if (!data.choices || !data.choices[0]) {
+      throw new Error('Invalid response format from OpenAI');
+    }
     return data.choices[0].message.content.trim();
   } catch (error) {
-    throw new Error('OpenAI API error: ' + (error.message || 'Unknown error'));
+    console.error('OpenAI API error:', error);
+    throw new Error('OpenAI: ' + (error.message || 'Unknown error'));
   }
 }
 
@@ -213,6 +229,8 @@ Return only the formatted analysis with no extra text.`;
 
 async function callOpenRouter(apiKey, prompt, systemPrompt, model, thinking = false, temperature = 0.5) {
   try {
+    console.log('Calling OpenRouter with model:', model);
+
     const body = {
       model: model || 'openai/gpt-4o-mini',
       max_tokens: 300,
@@ -242,19 +260,26 @@ async function callOpenRouter(apiKey, prompt, systemPrompt, model, thinking = fa
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
         'HTTP-Referer': chrome.runtime.getURL('/'),
-        'X-Title': 'Comment Generator'
+        'X-Title': 'EngageNow'
       },
       body: JSON.stringify(body)
     });
 
+    console.log('OpenRouter response status:', response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to generate comment');
+      console.error('OpenRouter error response:', errorData);
+      throw new Error(errorData.error?.message || `API error ${response.status}`);
     }
 
     const data = await response.json();
+    if (!data.choices || !data.choices[0]) {
+      throw new Error('Invalid response format from OpenRouter');
+    }
     return data.choices[0].message.content.trim();
   } catch (error) {
-    throw new Error('OpenRouter API error: ' + (error.message || 'Unknown error'));
+    console.error('OpenRouter API error:', error);
+    throw new Error('OpenRouter: ' + (error.message || 'Unknown error'));
   }
 }
