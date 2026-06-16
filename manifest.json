@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Comment Generator",
-  "version": "2.2.7",
+  "name": "EngageNow",
+  "version": "2.3.0",
   "description": "Generate comments with custom tone using Claude AI",
   "permissions": [
     "storage"
@@ -13,5 +13,8 @@
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://api.openai.com https://openrouter.ai"
   }
 }

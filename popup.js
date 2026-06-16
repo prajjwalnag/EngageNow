@@ -24,6 +24,17 @@ const analysisContent = document.getElementById('analysisContent');
 const closeAnalysisBtn = document.getElementById('closeAnalysisBtn');
 const toneBtns = document.querySelectorAll('.tone-btn');
 
+function sanitizeHTML(html) {
+  const div = document.createElement('div');
+  const allowedTags = ['strong', 'br', 'em'];
+  const text = html.replace(/<[^>]*>/g, (match) => {
+    if (allowedTags.some(tag => match.includes(tag))) return match;
+    return '';
+  });
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 let selectedPlatform = 'facebook';
 let selectedMode = 'normal';
 let selectedLength = 'medium';
@@ -38,9 +49,9 @@ let lastPlatform = '';
 let lastMode = '';
 let lastLength = '';
 
-// Load preferences
+// Load preferences - use sync for UI prefs, local for sensitive data
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get(['darkMode', 'emojiToggle', 'thinking', 'lastPostText', 'customCTA', 'temperature'], (data) => {
+  chrome.storage.sync.get(['darkMode', 'emojiToggle', 'thinking', 'temperature'], (data) => {
     if (data.darkMode) {
       document.body.classList.add('dark-mode');
     }
@@ -49,12 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (data.thinking !== undefined) {
       selectedThinking = data.thinking;
-    }
-    if (data.lastPostText) {
-      postTextEl.value = data.lastPostText;
-    }
-    if (data.customCTA) {
-      customCTAEl.value = data.customCTA;
     }
     if (data.temperature !== undefined) {
       selectedTemperature = data.temperature;
@@ -66,14 +71,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Save pasted text to storage
+// Input length limits for security
 postTextEl.addEventListener('input', () => {
-  chrome.storage.sync.set({ lastPostText: postTextEl.value });
+  const MAX_POST_LENGTH = 10000;
+  if (postTextEl.value.length > MAX_POST_LENGTH) {
+    postTextEl.value = postTextEl.value.substring(0, MAX_POST_LENGTH);
+  }
 });
 
-// Save custom CTA to storage
 customCTAEl.addEventListener('input', () => {
-  chrome.storage.sync.set({ customCTA: customCTAEl.value });
+  const MAX_CTA_LENGTH = 500;
+  if (customCTAEl.value.length > MAX_CTA_LENGTH) {
+    customCTAEl.value = customCTAEl.value.substring(0, MAX_CTA_LENGTH);
+  }
 });
 
 // Platform selection
@@ -277,7 +287,7 @@ historyBtn.addEventListener('click', () => {
 clearHistoryBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   if (confirm('Clear all comment history?')) {
-    chrome.storage.sync.set({ commentHistory: [] });
+    chrome.storage.local.set({ commentHistory: [] });
     historyList.innerHTML = '';
     emptyHistory.style.display = 'block';
   }
@@ -285,17 +295,15 @@ clearHistoryBtn.addEventListener('click', (e) => {
 
 // Load and display history
 function loadHistory() {
-  chrome.storage.sync.get(['commentHistory'], (data) => {
+  chrome.storage.local.get(['commentHistory'], (data) => {
     const history = data.commentHistory || [];
     const now = Date.now();
     const twentyFourHours = 24 * 60 * 60 * 1000;
 
-    // Filter out old comments (older than 24 hours)
     const recentHistory = history.filter(item => now - item.timestamp < twentyFourHours);
 
-    // Save cleaned history back
     if (recentHistory.length !== history.length) {
-      chrome.storage.sync.set({ commentHistory: recentHistory });
+      chrome.storage.local.set({ commentHistory: recentHistory });
     }
 
     historyList.innerHTML = '';
@@ -307,28 +315,36 @@ function loadHistory() {
 
     emptyHistory.style.display = 'none';
 
-    // Show most recent first
     recentHistory.reverse().forEach((item) => {
       const timeAgo = getTimeAgo(item.timestamp);
       const div = document.createElement('div');
       div.className = 'history-item';
-      div.innerHTML = `
-        <span class="history-item-text" title="${item.text}">${item.text.substring(0, 40)}...</span>
-        <span class="history-item-time">${timeAgo}</span>
-        <button class="history-item-copy">Copy</button>
-      `;
 
-      div.querySelector('.history-item-copy').addEventListener('click', (e) => {
+      const textSpan = document.createElement('span');
+      textSpan.className = 'history-item-text';
+      textSpan.textContent = item.text.substring(0, 40) + '...';
+      textSpan.title = item.text;
+
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'history-item-time';
+      timeSpan.textContent = timeAgo;
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'history-item-copy';
+      copyBtn.textContent = 'Copy';
+      copyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         navigator.clipboard.writeText(item.text);
-        const btn = e.target;
-        const originalText = btn.textContent;
-        btn.textContent = '✅';
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✅';
         setTimeout(() => {
-          btn.textContent = originalText;
+          copyBtn.textContent = originalText;
         }, 1500);
       });
 
+      div.appendChild(textSpan);
+      div.appendChild(timeSpan);
+      div.appendChild(copyBtn);
       historyList.appendChild(div);
     });
   });
@@ -347,13 +363,17 @@ function getTimeAgo(timestamp) {
 }
 
 function addToHistory(comment) {
-  chrome.storage.sync.get(['commentHistory'], (data) => {
+  chrome.storage.local.get(['commentHistory'], (data) => {
     const history = data.commentHistory || [];
+    const MAX_HISTORY_LENGTH = 100;
+    if (history.length >= MAX_HISTORY_LENGTH) {
+      history.shift();
+    }
     history.push({
       text: comment,
       timestamp: Date.now()
     });
-    chrome.storage.sync.set({ commentHistory: history });
+    chrome.storage.local.set({ commentHistory: history });
   });
 }
 
@@ -389,7 +409,7 @@ async function analyzePost() {
     if (response.error) {
       showError(response.error);
     } else if (response.analysis) {
-      analysisContent.innerHTML = response.analysis;
+      analysisContent.innerHTML = sanitizeHTML(response.analysis);
       analysisContainer.style.display = 'block';
     } else {
       showError('Invalid response from analysis');

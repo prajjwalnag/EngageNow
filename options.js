@@ -42,9 +42,15 @@ const providerDetails = {
   }
 };
 
-// Load saved provider, API key, model, pronoun, and thinking preference on page load
+// Load saved provider, API key, model, pronoun, and thinking preference
+// Use local storage for sensitive API key, sync for UI preferences
 document.addEventListener('DOMContentLoaded', async () => {
-  const { provider, apiKey, model, pronoun, thinking } = await chrome.storage.sync.get(['provider', 'apiKey', 'model', 'pronoun', 'thinking']);
+  const local = await chrome.storage.local.get(['apiKey']);
+  const sync = await chrome.storage.sync.get(['provider', 'model', 'pronoun', 'thinking']);
+
+  const { apiKey } = local;
+  const { provider, model, pronoun, thinking } = sync;
+
   if (provider) {
     providerSelect.value = provider;
   }
@@ -91,7 +97,7 @@ function populateModels() {
   });
 }
 
-// Save API key and model
+// Save API key and model - API key to local storage, preferences to sync
 saveBtn.addEventListener('click', async () => {
   const apiKey = apiKeyInput.value.trim();
   const provider = providerSelect.value;
@@ -108,6 +114,11 @@ saveBtn.addEventListener('click', async () => {
     return;
   }
 
+  if (apiKey.length < 20) {
+    showStatus('API key appears too short. Please check and try again.', 'error');
+    return;
+  }
+
   if (!model) {
     showStatus('Please select a model', 'error');
     return;
@@ -119,7 +130,10 @@ saveBtn.addEventListener('click', async () => {
   try {
     const pronoun = pronounSelect.value;
     const thinking = thinkingCheckbox.checked;
-    await chrome.storage.sync.set({ apiKey, provider, model, pronoun, thinking });
+
+    await chrome.storage.local.set({ apiKey });
+    await chrome.storage.sync.set({ provider, model, pronoun, thinking });
+
     showStatus('✅ Settings saved successfully!', 'success');
     setTimeout(() => {
       saveBtn.disabled = false;
@@ -135,7 +149,7 @@ saveBtn.addEventListener('click', async () => {
 // Clear API key
 clearBtn.addEventListener('click', async () => {
   if (confirm('Are you sure you want to delete the API key?')) {
-    await chrome.storage.sync.remove('apiKey');
+    await chrome.storage.local.remove('apiKey');
     apiKeyInput.value = '';
     showStatus('API key cleared', 'success');
   }

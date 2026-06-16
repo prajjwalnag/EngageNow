@@ -1,3 +1,11 @@
+function sanitizeError(error) {
+  if (error.message.includes('API key')) return 'API key error. Please check your settings.';
+  if (error.message.includes('401') || error.message.includes('403')) return 'Invalid API key or permissions denied.';
+  if (error.message.includes('429')) return 'Too many requests. Please wait a moment.';
+  if (error.message.includes('500')) return 'API server error. Please try again.';
+  return 'An error occurred. Please try again.';
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'generateComment') {
     generateCommentWithClaude(request.post, request.platform, request.mode, request.length, request.emoji, request.cockyBoost, request.techBoost, request.recipientName, request.thinking, request.customCTA, request.temperature)
@@ -5,24 +13,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ comment });
       })
       .catch(error => {
-        sendResponse({ error: error.message });
+        sendResponse({ error: sanitizeError(error) });
       });
-    return true; // Will respond asynchronously
+    return true;
   } else if (request.action === 'analyzePost') {
     analyzePost(request.post)
       .then(analysis => {
         sendResponse({ analysis });
       })
       .catch(error => {
-        sendResponse({ error: error.message });
+        sendResponse({ error: sanitizeError(error) });
       });
-    return true; // Will respond asynchronously
+    return true;
   }
 });
 
 async function generateCommentWithClaude(post, platform, mode = 'normal', length = 'medium', emoji = true, cockyBoost = false, techBoost = false, recipientName = '', thinking = false, customCTA = '', temperature = 0.5) {
-  // Get API key, provider, model, and pronoun from storage
-  const { apiKey, provider = 'openrouter', model, pronoun = 'I' } = await chrome.storage.sync.get(['apiKey', 'provider', 'model', 'pronoun']);
+  const { apiKey, provider = 'openrouter', model, pronoun = 'I' } = await chrome.storage.local.get(['apiKey', 'provider', 'model', 'pronoun']);
 
   if (!apiKey) {
     throw new Error('API key not configured. Please go to settings and add your API key.');
@@ -162,7 +169,7 @@ async function callOpenAI(apiKey, prompt, systemPrompt, model, thinking = false,
 }
 
 async function analyzePost(post) {
-  const { apiKey, provider = 'openrouter', model } = await chrome.storage.sync.get(['apiKey', 'provider', 'model']);
+  const { apiKey, provider = 'openrouter', model } = await chrome.storage.local.get(['apiKey', 'provider', 'model']);
 
   if (!apiKey) {
     throw new Error('API key not configured. Please go to settings and add your API key.');
