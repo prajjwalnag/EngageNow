@@ -32,11 +32,15 @@ const providerDetails = {
     prefix: 'sk-',
     description: 'GPT-4, GPT-4o, and other OpenAI models',
     models: {
-      'gpt-4o': 'GPT-4o (Best quality) ⭐',
+      'gpt-4o': 'GPT-4o (Best quality, vision) ⭐',
       'gpt-4o-mini': 'GPT-4o Mini (Fast & cheap)',
-      'gpt-4-turbo': 'GPT-4 Turbo (Powerful)',
+      'gpt-4-turbo': 'GPT-4 Turbo (Powerful, vision)',
       'gpt-4': 'GPT-4 (Powerful)',
-      'gpt-3.5-turbo': 'GPT-3.5 Turbo (Fast)'
+      'gpt-4-32k': 'GPT-4 32K (Extended context)',
+      'gpt-3.5-turbo': 'GPT-3.5 Turbo (Fast)',
+      'gpt-3.5-turbo-16k': 'GPT-3.5 Turbo 16K (Extended)',
+      'gpt-4-0125-preview': 'GPT-4 0125 Preview',
+      'gpt-4-1106-preview': 'GPT-4 1106 Preview'
     }
   }
 };
