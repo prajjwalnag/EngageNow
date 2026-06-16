@@ -1,5 +1,7 @@
 function sanitizeError(error) {
-  const msg = error.message || '';
+  if (!error) return 'An error occurred. Please try again.';
+
+  const msg = (error && error.message) ? String(error.message) : String(error);
   console.error('API Error:', msg);
 
   if (msg.includes('API key') || msg.includes('not configured')) return 'API key not configured. Go to settings and add your API key.';
@@ -9,6 +11,7 @@ function sanitizeError(error) {
   if (msg.includes('500') || msg.includes('server')) return 'API server error. Try again in a moment.';
   if (msg.includes('Failed to fetch') || msg.includes('network')) return 'Network error. Check your connection.';
   if (msg.includes('model')) return 'Invalid model selected. Check your settings.';
+  if (msg.includes('max_completion_tokens') || msg.includes('max_tokens')) return 'Model parameter error. Try a different model.';
 
   return `Error: ${msg.substring(0, 100)}`;
 }
