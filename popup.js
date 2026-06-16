@@ -560,12 +560,15 @@ async function renderStats(filter) {
 
 function renderPlatformChart(platformCounts) {
   const ctx = document.getElementById('platformChart').getContext('2d');
+  const isDark = document.body.classList.contains('dark-mode');
   const colors = {
     facebook: '#1877F2',
     linkedin: '#0A66C2',
-    x: '#000000',
+    x: isDark ? '#FFFFFF' : '#000000',
     reddit: '#FF4500'
   };
+  const textColor = isDark ? '#cbd5e1' : '#374151';
+  const gridColor = isDark ? '#404854' : '#e5e7eb';
 
   platformChart = new Chart(ctx, {
     type: 'bar',
@@ -582,8 +585,14 @@ function renderPlatformChart(platformCounts) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: isDark ? '#1a1f2e' : 'rgba(0,0,0,0.8)', titleColor: isDark ? '#e0e0e0' : '#fff', bodyColor: isDark ? '#e0e0e0' : '#fff' }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
+        x: { ticks: { color: textColor }, grid: { color: gridColor } }
+      }
     }
   });
 }
@@ -596,6 +605,9 @@ function renderTrendChart(stats, filter) {
 
   const sortedDates = Object.keys(dateMap).sort();
   const ctx = document.getElementById('trendChart').getContext('2d');
+  const isDark = document.body.classList.contains('dark-mode');
+  const textColor = isDark ? '#cbd5e1' : '#374151';
+  const gridColor = isDark ? '#404854' : '#e5e7eb';
 
   trendChart = new Chart(ctx, {
     type: 'line',
@@ -605,7 +617,7 @@ function renderTrendChart(stats, filter) {
         label: 'Daily Comments',
         data: sortedDates.map(d => dateMap[d]),
         borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)',
         tension: 0.4,
         fill: true,
         pointRadius: 4,
@@ -615,20 +627,29 @@ function renderTrendChart(stats, filter) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: isDark ? '#1a1f2e' : 'rgba(0,0,0,0.8)', titleColor: isDark ? '#e0e0e0' : '#fff', bodyColor: isDark ? '#e0e0e0' : '#fff' }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
+        x: { ticks: { color: textColor }, grid: { color: gridColor } }
+      }
     }
   });
 }
 
 function renderDistributionChart(platformCounts) {
   const ctx = document.getElementById('distributionChart').getContext('2d');
+  const isDark = document.body.classList.contains('dark-mode');
   const colors = {
     facebook: '#1877F2',
     linkedin: '#0A66C2',
-    x: '#000000',
+    x: isDark ? '#FFFFFF' : '#000000',
     reddit: '#FF4500'
   };
+  const textColor = isDark ? '#cbd5e1' : '#374151';
+  const borderColor = isDark ? '#1a1f2e' : '#fff';
 
   const labels = Object.keys(platformCounts).filter(p => platformCounts[p] > 0);
   const data = labels.map(p => platformCounts[p]);
@@ -641,14 +662,17 @@ function renderDistributionChart(platformCounts) {
       datasets: [{
         data: data,
         backgroundColor: bgColors,
-        borderColor: '#fff',
+        borderColor: borderColor,
         borderWidth: 2
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      plugins: { legend: { position: 'bottom' } }
+      plugins: {
+        legend: { position: 'bottom', labels: { color: textColor } },
+        tooltip: { backgroundColor: isDark ? '#1a1f2e' : 'rgba(0,0,0,0.8)', titleColor: isDark ? '#e0e0e0' : '#fff', bodyColor: isDark ? '#e0e0e0' : '#fff' }
+      }
     }
   });
 }

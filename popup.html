@@ -555,12 +555,21 @@
     }
 
     body.dark-mode #statsContainer {
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
     }
 
     body.dark-mode #statsContainer > div {
-      background: #1a1f2e;
-      color: #e0e0e0;
+      background: #1a1f2e !important;
+      color: #e0e0e0 !important;
+    }
+
+    body.dark-mode #statsContainer h2,
+    body.dark-mode #statsContainer h3 {
+      color: #e0e0e0 !important;
+    }
+
+    body.dark-mode #statsContainer canvas {
+      filter: brightness(0.95);
     }
 
     body.dark-mode .stats-filter-btn {
@@ -572,6 +581,22 @@
     body.dark-mode .stats-filter-btn:hover {
       background: #1e293b;
       border-color: #3b82f6;
+    }
+
+    body.dark-mode .stats-filter-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    body.dark-mode #statsContainer div[style*="background: #f3f4f6"] {
+      background: #0f1419 !important;
+      border: 1px solid #404854;
+    }
+
+    body.dark-mode #statsTotal,
+    body.dark-mode #statsBreakdown {
+      color: #e0e0e0 !important;
     }
   </style>
 </head>
