@@ -10,7 +10,7 @@ function sanitizeError(error) {
   if (msg.includes('429') || msg.includes('rate')) return 'Rate limited. Wait a moment and try again.';
   if (msg.includes('500') || msg.includes('server')) return 'API server error. Try again in a moment.';
   if (msg.includes('Failed to fetch') || msg.includes('network')) return 'Network error. Check your connection.';
-  if (msg.includes('model')) return 'Invalid model selected. Check your settings.';
+  if (msg.includes('invalid model') || msg.includes('model not found') || msg.includes('unknown model')) return 'Invalid model selected. Check your settings.';
   if (msg.includes('max_completion_tokens') || msg.includes('max_tokens')) return 'Model parameter error. Try a different model.';
 
   return `Error: ${msg.substring(0, 100)}`;
