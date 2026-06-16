@@ -1,9 +1,16 @@
 function sanitizeError(error) {
-  if (error.message.includes('API key')) return 'API key error. Please check your settings.';
-  if (error.message.includes('401') || error.message.includes('403')) return 'Invalid API key or permissions denied.';
-  if (error.message.includes('429')) return 'Too many requests. Please wait a moment.';
-  if (error.message.includes('500')) return 'API server error. Please try again.';
-  return 'An error occurred. Please try again.';
+  const msg = error.message || '';
+  console.error('API Error:', msg);
+
+  if (msg.includes('API key') || msg.includes('not configured')) return 'API key not configured. Go to settings and add your API key.';
+  if (msg.includes('401') || msg.includes('Unauthorized')) return 'Invalid API key. Check your settings.';
+  if (msg.includes('403') || msg.includes('Forbidden')) return 'API access denied. Check your API key permissions.';
+  if (msg.includes('429') || msg.includes('rate')) return 'Rate limited. Wait a moment and try again.';
+  if (msg.includes('500') || msg.includes('server')) return 'API server error. Try again in a moment.';
+  if (msg.includes('Failed to fetch') || msg.includes('network')) return 'Network error. Check your connection.';
+  if (msg.includes('model')) return 'Invalid model selected. Check your settings.';
+
+  return `Error: ${msg.substring(0, 100)}`;
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

@@ -228,9 +228,16 @@ async function generateComment() {
       temperature: selectedTemperature
     });
 
+    console.log('Generate response:', response);
+
+    if (!response) {
+      showError('No response from background. Reload the extension and try again.');
+      return;
+    }
+
     if (response.error) {
       showError(response.error);
-    } else {
+    } else if (response.comment) {
       generatedComment = response.comment;
       lastPost = postText;
       lastPlatform = selectedPlatform;
@@ -240,9 +247,13 @@ async function generateComment() {
       charCountEl.textContent = `${generatedComment.length} characters`;
       resultContainer.style.display = 'block';
       regenerateBtn.style.display = 'inline-block';
+    } else {
+      showError('Unexpected response. Please try again.');
+      console.error('Unexpected response format:', response);
     }
   } catch (error) {
-    showError('Error generating comment: ' + error.message);
+    console.error('Generation error:', error);
+    showError('Error: ' + (error.message || 'Unknown error. Check console for details.'));
   } finally {
     generateBtn.disabled = false;
     regenerateBtn.disabled = false;
