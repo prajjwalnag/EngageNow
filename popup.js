@@ -483,6 +483,11 @@ const clearStatsBtn = document.getElementById('clearStatsBtn');
 const statsBtns = document.querySelectorAll('.stats-filter-btn');
 
 statsLink.addEventListener('click', () => {
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js library not loaded');
+    alert('Charts library is loading. Please try again in a moment.');
+    return;
+  }
   statsContainer.style.display = 'block';
   renderStats('today');
 });
@@ -527,6 +532,8 @@ function destroyCharts() {
 async function renderStats(filter) {
   const stats = await getFilteredStats(filter);
 
+  console.log('Stats data:', stats, 'Filter:', filter);
+
   if (!stats || stats.length === 0) {
     document.getElementById('statsTotal').textContent = 'Total: 0 comments';
     document.getElementById('statsBreakdown').textContent = 'No data yet. Start posting comments!';
@@ -559,42 +566,51 @@ async function renderStats(filter) {
 }
 
 function renderPlatformChart(platformCounts) {
-  const ctx = document.getElementById('platformChart').getContext('2d');
-  const isDark = document.body.classList.contains('dark-mode');
-  const colors = {
-    facebook: '#1877F2',
-    linkedin: '#0A66C2',
-    x: isDark ? '#FFFFFF' : '#000000',
-    reddit: '#FF4500'
-  };
-  const textColor = isDark ? '#cbd5e1' : '#374151';
-  const gridColor = isDark ? '#404854' : '#e5e7eb';
-
-  platformChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(platformCounts).map(p => p.charAt(0).toUpperCase() + p.slice(1)),
-      datasets: [{
-        label: 'Comments Posted',
-        data: Object.values(platformCounts),
-        backgroundColor: Object.keys(platformCounts).map(p => colors[p]),
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: { backgroundColor: isDark ? '#1a1f2e' : 'rgba(0,0,0,0.8)', titleColor: isDark ? '#e0e0e0' : '#fff', bodyColor: isDark ? '#e0e0e0' : '#fff' }
-      },
-      scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
-        x: { ticks: { color: textColor }, grid: { color: gridColor } }
-      }
+  try {
+    const canvas = document.getElementById('platformChart');
+    if (!canvas) {
+      console.error('Platform chart canvas not found');
+      return;
     }
-  });
+    const ctx = canvas.getContext('2d');
+    const isDark = document.body.classList.contains('dark-mode');
+    const colors = {
+      facebook: '#1877F2',
+      linkedin: '#0A66C2',
+      x: isDark ? '#FFFFFF' : '#000000',
+      reddit: '#FF4500'
+    };
+    const textColor = isDark ? '#cbd5e1' : '#374151';
+    const gridColor = isDark ? '#404854' : '#e5e7eb';
+
+    platformChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(platformCounts).map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+        datasets: [{
+          label: 'Comments Posted',
+          data: Object.values(platformCounts),
+          backgroundColor: Object.keys(platformCounts).map(p => colors[p]),
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: isDark ? '#1a1f2e' : 'rgba(0,0,0,0.8)', titleColor: isDark ? '#e0e0e0' : '#fff', bodyColor: isDark ? '#e0e0e0' : '#fff' }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
+          x: { ticks: { color: textColor }, grid: { color: gridColor } }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error rendering platform chart:', error);
+  }
 }
 
 function renderTrendChart(stats, filter) {
