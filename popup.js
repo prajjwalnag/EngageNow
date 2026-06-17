@@ -559,6 +559,7 @@ statsLink.addEventListener('click', () => {
     alert('Charts library is loading. Please try again in a moment.');
     return;
   }
+  document.getElementById('manualDate').value = new Date().toISOString().split('T')[0];
   statsContainer.style.display = 'block';
   renderStats('today');
 });
@@ -592,6 +593,46 @@ clearStatsBtn.addEventListener('click', () => {
     statsContainer.style.display = 'none';
     destroyCharts();
   }
+});
+
+// Manual stat logging
+let manualPlatform = 'facebook';
+
+document.querySelectorAll('[data-manual-platform]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-manual-platform]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    manualPlatform = btn.dataset.manualPlatform;
+  });
+});
+
+document.getElementById('manualLogBtn').addEventListener('click', () => {
+  const date = document.getElementById('manualDate').value;
+  const count = Math.max(1, parseInt(document.getElementById('manualCount').value) || 1);
+
+  if (!date) return;
+
+  chrome.storage.local.get(['commentStats'], (data) => {
+    const stats = data.commentStats || [];
+    const existingIndex = stats.findIndex(s => s.date === date && s.platform === manualPlatform);
+
+    if (existingIndex >= 0) {
+      stats[existingIndex].count += count;
+    } else {
+      stats.push({ date, platform: manualPlatform, count });
+    }
+
+    chrome.storage.local.set({ commentStats: stats }, () => {
+      const activeFilter = document.querySelector('.stats-filter-btn.active[data-filter]')?.dataset.filter || 'today';
+      renderStats(activeFilter);
+
+      const feedback = document.getElementById('manualLogFeedback');
+      feedback.style.display = 'block';
+      setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+
+      document.getElementById('manualCount').value = 1;
+    });
+  });
 });
 
 function destroyCharts() {

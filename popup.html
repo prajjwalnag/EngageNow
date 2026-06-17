@@ -779,6 +779,102 @@
       color: var(--text-muted);
     }
 
+    /* ── Manual log ─────────────────────────── */
+    .manual-log {
+      margin-top: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .manual-log-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .manual-log-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .manual-platform-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .manual-platform-btn {
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .manual-platform-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .manual-platform-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .manual-date-input,
+    .manual-count-input {
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .manual-date-input:focus,
+    .manual-count-input:focus {
+      border-color: var(--accent);
+    }
+
+    .manual-date-input { flex: 1; min-width: 120px; }
+    .manual-count-input { width: 54px; }
+
+    .manual-log-btn {
+      padding: 5px 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .manual-log-btn:hover { background: var(--accent-hover); }
+
+    .manual-log-feedback {
+      font-size: 11px;
+      color: var(--success);
+      margin-top: 6px;
+      display: none;
+    }
+
     /* ── CTA presets ────────────────────────── */
     .cta-presets {
       display: flex;
@@ -1016,6 +1112,22 @@
         <div class="stats-summary">
           <div id="statsTotal" class="stats-total">Total: 0 comments</div>
           <div id="statsBreakdown" class="stats-breakdown">No data yet</div>
+        </div>
+
+        <div class="manual-log">
+          <div class="manual-log-title">Log Manual Comment</div>
+          <div class="manual-log-row">
+            <div class="manual-platform-group">
+              <button class="manual-platform-btn active" data-manual-platform="facebook">FB</button>
+              <button class="manual-platform-btn" data-manual-platform="linkedin">LI</button>
+              <button class="manual-platform-btn" data-manual-platform="x">𝕏</button>
+              <button class="manual-platform-btn" data-manual-platform="reddit">RD</button>
+            </div>
+            <input type="date" id="manualDate" class="manual-date-input">
+            <input type="number" id="manualCount" class="manual-count-input" value="1" min="1" max="999">
+            <button id="manualLogBtn" class="manual-log-btn">+ Log</button>
+          </div>
+          <div id="manualLogFeedback" class="manual-log-feedback">✅ Logged!</div>
         </div>
       </div>
     </div>
