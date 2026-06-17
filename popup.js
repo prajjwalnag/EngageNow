@@ -55,7 +55,7 @@ let distributionChart = null;
 
 // Load preferences - use sync for UI prefs, local for sensitive data
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get(['darkMode', 'emojiToggle', 'thinking', 'temperature', 'platform', 'mode', 'length', 'cockyBoost', 'techBoost'], (data) => {
+  chrome.storage.sync.get(['darkMode', 'emojiToggle', 'thinking', 'temperature', 'platform', 'mode', 'length', 'cockyBoost', 'techBoost', 'customCTA'], (data) => {
     if (data.darkMode) {
       document.body.classList.add('dark-mode');
     }
@@ -97,6 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
       techBoost = data.techBoost;
       document.getElementById('techBoost').classList.add('active');
     }
+    if (data.customCTA) {
+      customCTAEl.value = data.customCTA;
+      syncCTAPresets();
+    }
     updateDarkModeBtn();
     updateEmojiBtn();
   });
@@ -115,7 +119,30 @@ customCTAEl.addEventListener('input', () => {
   if (customCTAEl.value.length > MAX_CTA_LENGTH) {
     customCTAEl.value = customCTAEl.value.substring(0, MAX_CTA_LENGTH);
   }
+  chrome.storage.sync.set({ customCTA: customCTAEl.value });
+  syncCTAPresets();
 });
+
+// CTA preset chips
+document.querySelectorAll('.cta-preset').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const cta = chip.dataset.cta;
+    if (customCTAEl.value === cta) {
+      customCTAEl.value = '';
+    } else {
+      customCTAEl.value = cta;
+    }
+    chrome.storage.sync.set({ customCTA: customCTAEl.value });
+    syncCTAPresets();
+  });
+});
+
+function syncCTAPresets() {
+  const current = customCTAEl.value;
+  document.querySelectorAll('.cta-preset').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.cta === current);
+  });
+}
 
 // Platform selection
 toneBtns.forEach(btn => {

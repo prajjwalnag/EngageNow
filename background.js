@@ -128,7 +128,7 @@ async function generateCommentWithClaude(post, platform, mode = 'insight', lengt
 
   let ctaInstruction = '';
   if (customCTA) {
-    ctaInstruction = `\n\nCUSTOM CTA: End with this call-to-action naturally: "${customCTA}"`;
+    ctaInstruction = `\n\nCUSTOM CTA: Weave this into the comment so it feels like a natural next step — not a sentence slapped at the end: "${customCTA}". If it's an action ("DM me", "Book a call"), make it feel like the obvious next move given what you just said. If it's content-focused ("Follow for more", "Link in bio"), fold it into your closing thought. It should feel earned, not tacked on.`;
   }
 
   const prompt = `Generate a comment based on the post below.

@@ -779,6 +779,39 @@
       color: var(--text-muted);
     }
 
+    /* ── CTA presets ────────────────────────── */
+    .cta-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .cta-preset {
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface2);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .cta-preset:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .cta-preset.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     /* ── Recipient name container ───────────── */
     .recipient-card {
       display: none;
@@ -849,6 +882,16 @@
     <div class="card">
       <div class="card-label">Custom CTA <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></div>
       <input type="text" id="customCTA" placeholder="e.g. DM me, Follow for more...">
+      <div class="cta-presets">
+        <button class="cta-preset" data-cta="DM me">DM me</button>
+        <button class="cta-preset" data-cta="Follow for more">Follow for more</button>
+        <button class="cta-preset" data-cta="Link in bio">Link in bio</button>
+        <button class="cta-preset" data-cta="Book a call">Book a call</button>
+        <button class="cta-preset" data-cta="Comment below">Comment below</button>
+        <button class="cta-preset" data-cta="Share this">Share this</button>
+        <button class="cta-preset" data-cta="Save this">Save this</button>
+        <button class="cta-preset" data-cta="Tag someone">Tag someone</button>
+      </div>
     </div>
 
     <!-- Boosts + Length -->
