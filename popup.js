@@ -36,7 +36,7 @@ function sanitizeHTML(html) {
 }
 
 let selectedPlatform = 'facebook';
-let selectedMode = 'normal';
+let selectedMode = 'insight';
 let selectedLength = 'medium';
 let selectedEmoji = true;
 let cockyBoost = false;

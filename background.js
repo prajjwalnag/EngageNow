@@ -38,7 +38,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-async function generateCommentWithClaude(post, platform, mode = 'normal', length = 'medium', emoji = true, cockyBoost = false, techBoost = false, recipientName = '', thinking = false, customCTA = '', temperature = 0.5) {
+async function generateCommentWithClaude(post, platform, mode = 'insight', length = 'medium', emoji = true, cockyBoost = false, techBoost = false, recipientName = '', thinking = false, customCTA = '', temperature = 0.5) {
   const local = await chrome.storage.local.get(['apiKey']);
   const sync = await chrome.storage.sync.get(['provider', 'model', 'pronoun']);
   const apiKey = local.apiKey;
@@ -57,19 +57,24 @@ async function generateCommentWithClaude(post, platform, mode = 'normal', length
   }
 
   let systemPrompt = '';
-  const pronounPhrase = pronoun === 'we' ? 'our team/company' : 'your own';
+  const pronounPhrase = pronoun === 'we' ? 'our team/company' : 'yourself';
   const workPhrase = pronoun === 'we' ? 'work with teams' : 'work with people';
+  const noEmoji = !emoji ? ' Do NOT use any emojis.' : '';
 
-  if (mode === 'sell') {
-    systemPrompt = `You're a friendly professional who builds genuine relationships. You're knowledgeable about what ${pronounPhrase} offers, confident in value, and truly interested in helping people. Write like a trusted colleague - warm but professional. Use contractions. Be conversational and human. Share genuine enthusiasm about helping. Sound like someone people want to ${workPhrase}.${!emoji ? ' Do NOT use any emojis.' : ''}`;
+  if (mode === 'insight') {
+    systemPrompt = `You distill complex ideas into sharp, specific takes. You see the angle most people miss and say it clearly. No hedging, no filler — just a focused perspective that actually adds something new. Write like someone who's thought deeply about this topic and earned the right to have an opinion. Use contractions. Sound human.${noEmoji}`;
+  } else if (mode === 'debate') {
+    systemPrompt = `You're intellectually honest and enjoy good-faith disagreement. You hold contrarian views confidently without being combative. You acknowledge what's valid, then offer your real take. You're not trying to win — you're trying to move the conversation forward. Be direct and bold. Use contractions.${noEmoji}`;
+  } else if (mode === 'sell') {
+    systemPrompt = `You're a trusted advisor who leads with genuine value. You're confident in what you offer and know how to make it feel relevant without forcing it. You put their needs first — you're the person people actually want to call. Use contractions. Warm but professional.${noEmoji}`;
   } else if (mode === 'inbox') {
-    systemPrompt = `You're warm, genuine, and appreciative when someone reaches out. You take time to understand what they need and acknowledge it. Be personable and human - like you're texting a friend but keeping it professional. Use contractions. Show real interest. Make people feel valued and heard. Sound like someone who genuinely cares.${!emoji ? ' Do NOT use any emojis.' : ''}`;
-  } else if (mode === 'engagement-agree') {
-    systemPrompt = `You're genuinely interested in what people share and validate their ideas. You make them feel heard and understood. Write like someone who truly values their perspective. Use contractions. Show real appreciation for what they said. Make strong statements of agreement and connection. Sound like someone people trust because you get them.${!emoji ? ' Do NOT use any emojis.' : ''}`;
-  } else if (mode === 'engagement-ask') {
-    systemPrompt = `You're genuinely interested in what people share and know how to make them feel heard. You engage deeply with ideas and ask thoughtful questions. Write like someone who's truly invested in the conversation. Use contractions. Show genuine curiosity. Build connection through authentic engagement. Sound like someone people love talking with because you actually care about understanding their perspective.${!emoji ? ' Do NOT use any emojis.' : ''}`;
+    systemPrompt = `You're warm, direct, and take people seriously. When someone reaches out, you make them feel like their message actually mattered. You respond to what they specifically said, not a generic version of it. Use contractions. Efficient but human.${noEmoji}`;
+  } else if (mode === 'hype') {
+    systemPrompt = `You genuinely get excited by other people's wins and ideas. Your enthusiasm is real and specific — you notice the actual thing that's impressive, not just the fact that someone posted. You make people feel truly seen, not just liked. Use contractions. No filler phrases.${noEmoji}`;
+  } else if (mode === 'curious') {
+    systemPrompt = `You're genuinely curious and ask the questions that open everything up. You make people feel interesting by showing you actually paid attention. One sharp, specific question beats three generic ones. Use contractions. Sound like someone who actually wants to know.${noEmoji}`;
   } else {
-    systemPrompt = `You are a knowledgeable person sharing insights. Write like you're talking to a friend - natural, authentic, conversational. Avoid corporate jargon, AI-speak, or anything that sounds like it came from a robot. Use contractions. Be genuine. Use real human language - the way you'd actually comment if you were scrolling on your phone. Skip the flowery language and get to the point. Sound like a person, not an algorithm.${!emoji ? ' Do NOT use any emojis.' : ''}`;
+    systemPrompt = `You are a knowledgeable person sharing insights. Write naturally and authentically. Use contractions. Sound like a real person, not an algorithm.${noEmoji}`;
   }
 
   let platformInstruction = '';
@@ -84,20 +89,24 @@ async function generateCommentWithClaude(post, platform, mode = 'normal', length
   }
 
   let modeInstruction = '';
-  if (mode === 'sell') {
-    const sellPhrase = pronoun === 'we'
-      ? `"Happy to help if you want to chat" or "We've done similar work - let me know if you want to connect" or "Always down to collaborate"`
-      : `"Happy to help if you want to chat" or "I've done similar work - let me know if you want to connect" or "Always down to help"`;
-    modeInstruction = `SELL MODE: Mention how ${pronoun === 'we' ? 'you could work together' : 'you could help them'}, but make it feel natural - like you're genuinely offering to help, not pitching. End with something like ${sellPhrase}. Feel organic, not salesy.`;
+  if (mode === 'insight') {
+    modeInstruction = `INSIGHT MODE: Don't restate what they said — go one level deeper. Find the most interesting implication, overlooked angle, or specific nuance in this post. Share a concrete observation or experience that adds something the original post didn't. Make the reader think "I hadn't considered that." Lead with the insight, not with praise for their post.`;
+  } else if (mode === 'debate') {
+    modeInstruction = `DEBATE MODE: Find the assumption, gap, or claim in their post that deserves a challenge. Start by acknowledging what's valid ("Fair point on X, but..."), then push back specifically and confidently. Name exactly what you'd challenge and why. Be direct — phrases like "I'd push back on one thing" or "The part I'd question is..." work well. End strong with your position. This is about sparking real discussion, not being contrarian for its own sake.`;
+  } else if (mode === 'sell') {
+    const softCTA = pronoun === 'we'
+      ? `"Happy to share how we approach this" or "DM us if you want to explore it" or "We've tackled this — let me know if useful"`
+      : `"Happy to share how I approach this" or "DM me if you want to explore it" or "I've tackled this — let me know if useful"`;
+    modeInstruction = `SELL MODE: Lead with genuine value — acknowledge their situation with a specific, useful insight. Then naturally bridge to how ${pronoun === 'we' ? 'your team helps' : 'you help'} with exactly this kind of challenge. One soft invitation at the end, like ${softCTA}. Never sound like a pitch — sound like the trusted person worth calling.`;
   } else if (mode === 'inbox') {
     const nameGreeting = recipientName ? `Hi ${recipientName},` : 'Hi,';
-    modeInstruction = `INBOX MODE: This is a response to someone who reached out to you first. Start with "${nameGreeting}" Extract from their message what they're looking for or interested in, and acknowledge it. Example format: "${nameGreeting} I see you're looking for [what they want]. [Your offer to help]". Be warm, appreciative, and professional. Make them feel heard. Show genuine interest. End with a clear next step or question to keep the conversation going.`;
-  } else if (mode === 'engagement-agree') {
-    modeInstruction = `AGREE MODE: Validate and agree with what they shared. Comment on something specific they said to show you really got it. Make them feel understood and appreciated. End with a strong statement of agreement or connection - NO QUESTIONS. This is about making them feel heard and seen.`;
-  } else if (mode === 'engagement-ask') {
-    modeInstruction = `ENGAGE MODE: Show genuine interest in what they shared. Ask a thoughtful question that shows you really understood their post. Comment on something specific they said - not generic praise. Make them feel like you're genuinely engaged with their ideas. Build connection through real curiosity about their perspective or experience. End with a question to continue the conversation.`;
+    modeInstruction = `INBOX MODE: This is a reply to someone who messaged you first. Start with "${nameGreeting}" Read what they said carefully and respond to the actual content — not a generic version of it. Acknowledge what they specifically asked or shared. Offer one concrete next step to keep things moving. Warm but efficient — like someone who respects their time.`;
+  } else if (mode === 'hype') {
+    modeInstruction = `HYPE MODE: Find the specific thing in this post that's actually impressive, insightful, or worth celebrating — then react to that exact thing. Reference it directly to prove you actually read it. Make them feel like this post was worth sharing. No filler phrases like "so inspiring," "love this," "absolutely," or "this is so good." React to the real thing with real energy. End with a strong statement — no questions.`;
+  } else if (mode === 'curious') {
+    modeInstruction = `CURIOUS MODE: Find the most interesting unanswered question hiding in their post — the one that shows you actually read it carefully. Not "would love to hear more" — something specific that makes them want to write a paragraph back. Build up to it naturally with a brief reaction, then land on that one focused question. One sharp question beats three generic ones.`;
   } else {
-    modeInstruction = `INFORMATIVE MODE: Just share something useful or your honest perspective. No hidden agenda. Help them think deeper or see something they missed. Keep it real.`;
+    modeInstruction = `INFORMATIVE MODE: Share a useful perspective or honest take. Help them think deeper or see something they might have missed. Keep it real.`;
   }
 
   let boostInstructions = '';
