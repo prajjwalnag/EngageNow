@@ -22,7 +22,7 @@ const customCTAEl = document.getElementById('customCTA');
 const analysisContainer = document.getElementById('analysisContainer');
 const analysisContent = document.getElementById('analysisContent');
 const closeAnalysisBtn = document.getElementById('closeAnalysisBtn');
-const toneBtns = document.querySelectorAll('.tone-btn');
+const toneBtns = document.querySelectorAll('.pill-btn');
 
 function sanitizeHTML(html) {
   const div = document.createElement('div');
