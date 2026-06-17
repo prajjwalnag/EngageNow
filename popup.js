@@ -55,7 +55,7 @@ let distributionChart = null;
 
 // Load preferences - use sync for UI prefs, local for sensitive data
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get(['darkMode', 'emojiToggle', 'thinking', 'temperature'], (data) => {
+  chrome.storage.sync.get(['darkMode', 'emojiToggle', 'thinking', 'temperature', 'platform', 'mode', 'length', 'cockyBoost', 'techBoost'], (data) => {
     if (data.darkMode) {
       document.body.classList.add('dark-mode');
     }
@@ -69,6 +69,33 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedTemperature = data.temperature;
       document.getElementById('temperatureSlider').value = selectedTemperature * 100;
       updateTemperatureLabel();
+    }
+    if (data.platform) {
+      selectedPlatform = data.platform;
+      document.querySelectorAll('[data-platform]').forEach(b => {
+        b.classList.toggle('active', b.dataset.platform === selectedPlatform);
+      });
+    }
+    if (data.mode) {
+      selectedMode = data.mode;
+      document.querySelectorAll('[data-mode]').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === selectedMode);
+      });
+      nameContainer.style.setProperty('display', selectedMode === 'inbox' ? 'block' : 'none', 'important');
+    }
+    if (data.length) {
+      selectedLength = data.length;
+      document.querySelectorAll('[data-length]').forEach(b => {
+        b.classList.toggle('active', b.dataset.length === selectedLength);
+      });
+    }
+    if (data.cockyBoost) {
+      cockyBoost = data.cockyBoost;
+      document.getElementById('cockyBoost').classList.add('active');
+    }
+    if (data.techBoost) {
+      techBoost = data.techBoost;
+      document.getElementById('techBoost').classList.add('active');
     }
     updateDarkModeBtn();
     updateEmojiBtn();
@@ -97,6 +124,7 @@ toneBtns.forEach(btn => {
       document.querySelectorAll('[data-platform]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedPlatform = btn.dataset.platform;
+      chrome.storage.sync.set({ platform: selectedPlatform });
     });
   }
 });
@@ -108,6 +136,7 @@ toneBtns.forEach(btn => {
       document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedMode = btn.dataset.mode;
+      chrome.storage.sync.set({ mode: selectedMode });
 
       nameContainer.style.display = selectedMode === 'inbox' ? 'block' : 'none';
       nameContainer.style.setProperty('display', selectedMode === 'inbox' ? 'block' : 'none', 'important');
@@ -119,11 +148,13 @@ toneBtns.forEach(btn => {
 document.getElementById('cockyBoost').addEventListener('click', (e) => {
   cockyBoost = !cockyBoost;
   e.target.classList.toggle('active');
+  chrome.storage.sync.set({ cockyBoost });
 });
 
 document.getElementById('techBoost').addEventListener('click', (e) => {
   techBoost = !techBoost;
   e.target.classList.toggle('active');
+  chrome.storage.sync.set({ techBoost });
 });
 
 // Length selection
@@ -133,6 +164,7 @@ toneBtns.forEach(btn => {
       document.querySelectorAll('[data-length]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedLength = btn.dataset.length;
+      chrome.storage.sync.set({ length: selectedLength });
     });
   }
 });
